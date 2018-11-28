@@ -1,4 +1,5 @@
-import requests, re, time
+# -*- coding:utf-8 -*-
+import requests, re, time, json
 from PIL import Image
 from io import BytesIO
 from bs4 import BeautifulSoup
@@ -249,6 +250,26 @@ def book_titles(seachname, xiaoqu=None):
 # allsum:'149(检索到书的本书)', 1：{'titlesname' :'书名'，'titlesspace' :'索书号（位置）', 'titleslink' :'书籍链接', 'kejie':'可借分书'}}
 
 
+def isbn_dou(isbn):
+    isbn = isbn.replace('-','')
+    url = 'https://api.douban.com/v2/book/isbn/'+isbn
+    response = requests.get(url).text
+    result = eval(response)
+    douban_data = {}
+    if "catalog" in result:
+        douban_data["catalog"] = result["catalog"]
+    else:
+        douban_data["catalog"] = ""
+    if "image" in result:
+        douban_data["image"] = result["image"]
+    else:
+        douban_data["image"] = ""
+    if "summary" in result:
+        douban_data["intro"] = result["summary"]
+    return douban_data
+# 将isbn作为变量传递函数中，图片url 目录 简介
+
+
 def lib_bk(num):
     url = 'http://210.35.251.243/opac/item.php?marc_no={}'.format(num)
     res = requests.get(url).text
@@ -262,37 +283,43 @@ def lib_bk(num):
             what_thing = one_line[2]
             all_data['{}'.format(what_name)] = what_thing
     last_data = {}
-    bk_name_au = all_data['题名/责任者:'].split('/')
-    last_data['name'] = bk_name_au[0]
-    last_data['author'] = bk_name_au[1][:-2]
-    last_data['isbn'] = re.findall(r'\d+', all_data['ISBN及定价:'].replace('-', ''))[0]
-    if '中图法分类号:' not in all_data:
-        last_data['place'] = '不明'
-    else:
-        last_data['place'] = all_data['中图法分类号:']
-    if '出版发行项:' not in all_data:
-        last_data['pub'] = '不明'
-        last_data['year'] = '不明'
-    else:
-        pub_year = all_data['出版发行项:'].split(',')
-        pub = pub_year[0]
-        year = pub_year[1]
-        last_data['pub'] = pub
-        last_data['year'] = year
-    if '载体形态项:' not in all_data:
-        last_data['pages'] = '不明'
-    else:
-        ye_site = all_data['载体形态项:'].find('页')
-        last_data['pages'] = all_data['载体形态项:'][0:ye_site]
-    if '学科主题:' not in all_data:
-        last_data['bk_class'] = '不明'
-    else:
-        last_data['bk_class'] = all_data['学科主题:']
-    if '提要文摘附注:' not in all_data:
-        last_data['intro'] = '不明'
-    else:
-        last_data['intro'] = all_data['提要文摘附注:']
-    return last_data
+    try:
+        bk_name_au = all_data['题名/责任者:'].split('/')
+        isbn = re.findall(r'\d+', all_data['ISBN及定价:'].replace('-', ''))[0]
+        last_data['name'] = bk_name_au[0]
+        last_data['author'] = bk_name_au[1][:-2]
+        last_data['isbn'] = isbn
+        if '中图法分类号:' not in all_data:
+            last_data['place'] = '不明'
+        else:
+            last_data['place'] = all_data['中图法分类号:']
+        if '出版发行项:' not in all_data:
+            last_data['pub'] = '不明'
+            last_data['year'] = '不明'
+        else:
+            pub_year = all_data['出版发行项:'].split(',')
+            pub = pub_year[0]
+            year = pub_year[1]
+            last_data['pub'] = pub
+            last_data['year'] = year
+        if '载体形态项:' not in all_data:
+            last_data['pages'] = '不明'
+        else:
+            ye_site = all_data['载体形态项:'].find('页')
+            last_data['pages'] = all_data['载体形态项:'][0:ye_site]
+        if '学科主题:' not in all_data:
+            last_data['bk_class'] = '不明'
+        else:
+            last_data['bk_class'] = all_data['学科主题:']
+        if '提要文摘附注:' not in all_data:
+            last_data['intro'] = '不明'
+        else:
+            last_data['intro'] = all_data['提要文摘附注:']
+        douban_data = isbn_dou(isbn)
+        last_data = dict(last_data, **douban_data) # 合并两个字典，如果有豆瓣的简介，图书馆的简介将会被取代
+        return last_data
+    except KeyError:
+        return 'no this book'
 
 
 # coki = login(5701118133, 100428)
@@ -300,8 +327,10 @@ def lib_bk(num):
 # # print(my_data)
 # print(my_all_bk(coki))
 # xu_jie(coki, 'AN1468872', '160E2185')
-print(lib_bk('0000777334'))
-
+print(lib_bk('0000316444'))
+# aaa = getInfoFromDouban('978-7-302-15120-3').replace('true','').replace('false','').replace('\\','')
+# js = json.dumps(aaa, indent=4, sort_keys=True, ensure_ascii=False)
+# print(eval(aaa))
 
 end = time.clock()
 print('运行时间为 %s s' % (end-start))
