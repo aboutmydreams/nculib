@@ -78,14 +78,16 @@ def login(user, psd):
     }
 
     data = {
-        'number':'{}'.format(user),
-        'passwd':'{}'.format(psd),
-        'captcha':captcha,
-        'select':'cert_no',
-        'returnUrl':'',
+        'number': '{}'.format(user),
+        'passwd': '{}'.format(psd),
+        'captcha': captcha,
+        'select': 'cert_no',
+        'returnUrl': '',
     }
     Status = requests.post('http://210.35.251.243/reader/redr_verify.php', headers=headers, data=data).status_code
     print(Status)
+    if Status != 200:
+        return "500"
     return coki
 # 这是一个登入函数，传入学号和密码，返回有效cookie
 
@@ -174,6 +176,22 @@ def my_all_bk(cookie):
         all_bk.append(a_bk)
     return str(all_bk)
 # 返回我的历史借阅，格式为[['C语言编程之道', '2018-09-18', '2018-10-09'], ['数学与人类文明', '2018-09-18', '2018-10-09']]
+
+
+def my_rank(cookie):
+    url = 'http://210.35.251.243/reader/redr_info.php'
+    site = 'div.hidden.pT20 > h2 > span'
+    headers = {
+        'Cookie': cookie,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+    }
+    res = requests.get(url, headers = headers)
+    soup = BeautifulSoup(res.text, 'lxml')
+    if "证件信息" not in res.text:
+        return 'error'
+    rank = soup.select(site)[0].get_text()
+    return rank
+# 返回字符串 超越人数
 
 
 def book_no(seachname, xiaoqu=None):
@@ -285,9 +303,13 @@ def lib_bk(num):
     last_data = {}
     try:
         bk_name_au = all_data['题名/责任者:'].split('/')
-        isbn = re.findall(r'\d+', all_data['ISBN及定价:'].replace('-', ''))[0]
         last_data['name'] = bk_name_au[0]
         last_data['author'] = bk_name_au[1][:-2]
+        isbn0 = re.findall(r'\d+', all_data['ISBN及定价:'].replace('-', ''))
+        if len(isbn0) > 0:
+            isbn = isbn0[0]
+        else:
+            isbn = '不明'
         last_data['isbn'] = isbn
         if '中图法分类号:' not in all_data:
             last_data['place'] = '不明'
@@ -322,12 +344,14 @@ def lib_bk(num):
         return 'no this book'
 
 
-# coki = login(5701118133, 100428)
-# # my_data = get_mynow_bk(coki)
-# # print(my_data)
+coki = login('7901117101', 'a00000000')
+# my_data = get_mynow_bk(coki)
+# print(my_data)
 # print(my_all_bk(coki))
 # xu_jie(coki, 'AN1468872', '160E2185')
-print(lib_bk('0000316444'))
+# print(coki)
+print(my_rank(coki))
+# print(lib_bk('0000310454'))
 # aaa = getInfoFromDouban('978-7-302-15120-3').replace('true','').replace('false','').replace('\\','')
 # js = json.dumps(aaa, indent=4, sort_keys=True, ensure_ascii=False)
 # print(eval(aaa))
