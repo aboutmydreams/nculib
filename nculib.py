@@ -194,7 +194,7 @@ def my_rank(cookie):
 # 返回字符串 超越人数
 
 
-def book_no(seachname, xiaoqu=None):
+def findall_book(seachname, xiaoqu=None):
     if not xiaoqu:
         xiaoqu = 'ALL'
     url0 = 'http://210.35.251.243/opac/openlink.php?dept={}&title={}&doctype=ALL&lang_code=ALL&match_flag=forward&displaypg=100&showmode=list&orderby=DESC&sort=CATA_DATE&onlylendable=no&with_ebook=on'.format(str(xiaoqu),str(seachname))#第一页
@@ -230,14 +230,14 @@ def book_no(seachname, xiaoqu=None):
 # 全部搜索
 
 
-def book_titles(seachname, xiaoqu=None):
+def get_book(seachname, xiaoqu=None):
     if not xiaoqu:
         xiaoqu = 'ALL'
     url0 = 'http://210.35.251.243/opac/openlink.php?dept={}&title={}&doctype=ALL&lang_code=ALL&match_flag=forward&displaypg=100&showmode=list&orderby=DESC&sort=CATA_DATE&onlylendable=yes&with_ebook=on'.format(str(xiaoqu),str(seachname))#第一页
     # 表格 快0.3s 但是没有可借数据 url1 = 'http://210.35.251.243/opac/openlink.php?strSearchType=title&match_flag=forward&historyCount=1&strText={}&doctype=ALL&with_ebook=on&displaypg=100&showmode=table&sort=CATA_DATE&orderby=desc&dept=ALL'.format(str(seachname))
     wb_data = requests.get(url0)
     if '本馆没有' in wb_data.text:
-        return book_no(seachname,xiaoqu)
+        return findall_book(seachname,xiaoqu)
     soup = BeautifulSoup(wb_data.text,'lxml')
     titles = soup.select('#search_book_list > li > h3')
     kejies = soup.select('#search_book_list > li > p > span')
@@ -259,11 +259,10 @@ def book_titles(seachname, xiaoqu=None):
             'titlesspace' : titlesspace,
             'titleslink' : 'http://210.35.251.243/opac/item.php?marc_no='+atitle[47:57],
             'kejie' : str(list(kejie.stripped_strings)[1])[-1]+'/'+str(list(kejie.stripped_strings)[0])[-1]
-
         }
         bks[n] = data
         n += 1
-    return bks
+    return str(bks)
 # 只返回可借的，没有可借时才返回不可借的，格式为
 # allsum:'149(检索到书的本书)', 1：{'titlesname' :'书名'，'titlesspace' :'索书号（位置）', 'titleslink' :'书籍链接', 'kejie':'可借分书'}}
 
@@ -342,19 +341,21 @@ def lib_bk(num):
         return last_data
     except KeyError:
         return 'no this book'
+# 返回具体图书的数据
 
-
-coki = login('7901117101', 'a00000000')
+# coki = login('7901117101', '7901117101')
 # my_data = get_mynow_bk(coki)
 # print(my_data)
 # print(my_all_bk(coki))
 # xu_jie(coki, 'AN1468872', '160E2185')
 # print(coki)
-print(my_rank(coki))
+
+# print(my_rank(coki))
+
 # print(lib_bk('0000310454'))
 # aaa = getInfoFromDouban('978-7-302-15120-3').replace('true','').replace('false','').replace('\\','')
 # js = json.dumps(aaa, indent=4, sort_keys=True, ensure_ascii=False)
 # print(eval(aaa))
 
-end = time.clock()
-print('运行时间为 %s s' % (end-start))
+# end = time.clock()
+# print('运行时间为 %s s' % (end-start))
