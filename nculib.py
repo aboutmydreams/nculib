@@ -87,7 +87,7 @@ def login(user, psd):
     Status = requests.post('http://210.35.251.243/reader/redr_verify.php', headers=headers, data=data).status_code
     print(Status)
     if Status != 200:
-        return "500"
+        return "flase"
     return coki
 # 这是一个登入函数，传入学号和密码，返回有效cookie
 
@@ -343,19 +343,14 @@ def lib_bk(num):
         return 'no this book'
 # 返回具体图书的数据
 
-# coki = login('7901117101', '7901117101')
+# coki = login('7901117101', '79011171011')
 # my_data = get_mynow_bk(coki)
 # print(my_data)
 # print(my_all_bk(coki))
 # xu_jie(coki, 'AN1468872', '160E2185')
-# print(coki)
-
 # print(my_rank(coki))
-
 # print(lib_bk('0000310454'))
-# aaa = getInfoFromDouban('978-7-302-15120-3').replace('true','').replace('false','').replace('\\','')
-# js = json.dumps(aaa, indent=4, sort_keys=True, ensure_ascii=False)
-# print(eval(aaa))
+
 
 # end = time.clock()
 # print('运行时间为 %s s' % (end-start))

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A layout example that shows off a responsive product landing page.">
+    <title>Find Book</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="../static/css/layouts/marketing.css">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <style type="text/css">
+      .content-wrapper1 {
+        position: absolute;
+        top: 94%;
+        width: 100%;
+        min-height: 6%;
+        z-index: 2;
+        background: white;
+      }
+      .splash1 {
+
+        width: 80%;
+        height: 50%;
+        margin: auto;
+        position: absolute;
+        top: 100px; left: 0; bottom: 40%; right: 0;
+        text-align: center;
+        text-transform: uppercase;
+    }
+    </style>
+
+</head>
+<body>
+
+<script>
+function validateForm() {
+    var x = document.forms["myForm"]["username"].value;
+    var y = document.forms["myForm"]["password"].value;
+    if (x == null || x == "") {
+        alert("需要输入书名哟");
+        return false;
+    }
+}
+</script>
+
+
+
+<div class="header">
+    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">Shoujibiao</a>
+
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="" class="pure-menu-link">Home</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link" id="tour1">Tour</a></li>
+            <li class="pure-menu-item"><a class="pure-menu-link" id="longin_di">Sign Up</a></li>
+        </ul>
+    </div>
+</div>
+
+<div id="blue-con" class="container-green">
+    <div class="splash1">
+        <div class="pure-g pure-u-1" >
+            <form class="pure-form pure-form-stacked pure-u-md-2-5" action="/login" method="post" onsubmit="return validateForm()" name="myForm">
+                <fieldset>
+                    <label for="email">Your Name</label>
+                    <input id="name1" type="text" name="username" placeholder="请输入书名" style="float: left">
+                    <label for="email">Your Password</label>
+                    <input id="name1" type="password" name="password" placeholder="请输入书名" style="float: left">
+                    <button type="submit" id="queren" class="pure-button pure-button-primary">寻找</button>
+                </fieldset>
+            </form>
+        </div>
+        <p class="splash-subhead">
+            我们乐于奉献，我们勇于发光，we create a beautiful world.
+        </p>
+    </div>
+</div>
+
+
+<div class="content-wrapper1">
+    <div class="footer l-box is-center">
+        To develop more love
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        var token = window.localStorage.getItem("token");
+        $.post("/tokens",{'token':token},function(result){
+            $("html").html(result);
+        });
+    });
+</script>
+
+
+
+</body>
+</html>
