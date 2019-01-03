@@ -1,7 +1,8 @@
 #-*- coding: utf-8 -*-
 import os,time,datetime,json,requests,base64,nculib
 from flask import Flask,redirect,url_for,render_template,request,send_file,send_from_directory
-from itsdangerous import JSONWebSignatureSerializer, URLSafeSerializer
+from itsdangerous import JSONWebSignatureSerializer
+import pymysql.cursors
 
 
 app = Flask(__name__)
@@ -33,9 +34,12 @@ def my_page():
         else:
             s = JSONWebSignatureSerializer('spxyzqs')
             token = s.dumps({user: psd})
+            connection = pymysql.connect(host = 'localhost',user = 'root',password = '123456',db = 'usertoken',charset = 'utf8mb4')
+            connection.cursor()
+
             return render_template("my.html")
 
 
-
+print('begin')
 if __name__ == '__main__':
     app.run(debug=True) #host='0.0.0.0', port=80, 

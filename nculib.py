@@ -1,8 +1,14 @@
 # -*- coding:utf-8 -*-
-import requests, re, time, json
-from PIL import Image
+import json
+import re
+import time
+import pymysql.cursors
 from io import BytesIO
+from flask import render_template,request
+import requests
 from bs4 import BeautifulSoup
+from itsdangerous import JSONWebSignatureSerializer, URLSafeSerializer
+from PIL import Image
 
 start = time.clock()
 
