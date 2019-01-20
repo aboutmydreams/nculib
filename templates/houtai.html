@@ -125,27 +125,14 @@ function validateForm() {
 <script>
   $(document).ready(function(){
     // var data1 = eval($(document).load("/see"));
-    window.localStorage.setItem("token", "spxyzqs");
     $.get("/see",function(data){
         var sta=eval(data);
         for (var i=0;i<sta.length;i++){
             $("tbody").append("<tr><td>"+sta[i][0]+"</td><td>"+sta[i][1]+"</td><td>"+sta[i][2]+"</td></tr>");
         };
     });
+  });
 
-});
-
-
-//document.getElementById("actname").innerHTML="段落已修改。";
-// $("#xinxi1").click(function xinxiq(){
-//     $.post("/xinxi",{
-//         username:"123",
-//         password:"123"
-//     },
-//     function(data,status){
-//         alert("数据: \n" + data + "\n状态: " + status);
-//     });
-// });
 </script>
 
 </body>
