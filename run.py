@@ -1,6 +1,15 @@
 #-*- coding: utf-8 -*-
-import os,time,datetime,json,requests,base64,nculib
+import os,time,datetime,json,requests,base64,nculib,sys,random
 from flask import Flask,redirect,url_for,render_template,request,send_file,send_from_directory
+import numpy as np
+from PIL import Image
+from io import BytesIO
+from bs4 import BeautifulSoup
+from array import array
+from tqdm import tqdm
+import warnings
+
+warnings.filterwarnings("ignore")
 # from itsdangerous import JSONWebSignatureSerializer
 # import pymysql.cursors
 
@@ -28,10 +37,10 @@ def break_img():
 
 @app.route('/liblogin', methods=['POST'])
 def liblogin():
-    usename = str(request.form['usename'])
-    password = str(request.form['password'])
-    print(usename,password)
-    return str(crawler.lib_login(usename,password))
+    usename = request.form['usename']
+    password = request.form['password']
+    res = crawler.lib_login(str(usename),str(password))
+    return res
 
 '''
 @app.route('/login', methods=['POST','GET'])

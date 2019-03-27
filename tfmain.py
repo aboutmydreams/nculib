@@ -52,6 +52,7 @@ def break_capt(img):
     test_x = np.array(mode_list)
     ans = pred_ans(test_x)
     res = ''.join(map(chr_num,ans.tolist()))
+    # print(res)
     return res
 
 def break_imgs():
