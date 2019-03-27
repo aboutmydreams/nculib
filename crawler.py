@@ -122,6 +122,7 @@ class ImgVerifier:
 			return 4,self.cookie
 		else:
 			# self.img.save('imgs/time_imgs/{}.png'.format(code + '-' + str(time.time())[-10:-3].replace('.',str(random.random())[2:4])))
+			# print(res.text)
 			return True,self.cookie
 
 def lib_login(usename,password):
@@ -157,4 +158,4 @@ def trains(times):
 # verifier.getLoginData()
 # a = verifier.verify()
 # print(a)
-print(lib_login(123,123))
+# print(lib_login(123,123))

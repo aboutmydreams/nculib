@@ -33,14 +33,16 @@ def download_file(bookname):
 
 @app.route('/break', methods=['GET'])
 def break_img():
-    return tfmain.break_imgs()
+    return str(tfmain.break_imgs())
 
 @app.route('/liblogin', methods=['POST'])
 def liblogin():
-    usename = request.form['usename']
+    username = request.form['username']
     password = request.form['password']
-    res = crawler.lib_login(str(usename),str(password))
-    return res
+    # res = crawler.ImgVerifier(str(username),str(password))
+    # res.getLoginData()
+    res = crawler.lib_login(username, password)
+    return str(res)
 
 '''
 @app.route('/login', methods=['POST','GET'])

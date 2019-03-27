@@ -58,7 +58,9 @@ def break_capt(img):
 def break_imgs():
     img,coki = test_lib_img()
     code = break_capt(img)
-    return code,coki
-    
+    print(code,str(coki))
+    return code,str(coki)
+
+# break_imgs()
 # img.show()
 # print(break_capt(img))
