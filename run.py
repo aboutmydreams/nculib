@@ -1,8 +1,10 @@
 #-*- coding: utf-8 -*-
 import os,time,datetime,json,requests,base64,nculib
 from flask import Flask,redirect,url_for,render_template,request,send_file,send_from_directory
-from itsdangerous import JSONWebSignatureSerializer
-import pymysql.cursors
+# from itsdangerous import JSONWebSignatureSerializer
+# import pymysql.cursors
+
+import tfmain,crawler
 
 
 app = Flask(__name__)
@@ -20,6 +22,18 @@ def download_file(bookname):
     bk_data = nculib.get_book(bookname)
     return bk_data
 
+@app.route('/break', methods=['GET'])
+def break_img():
+    return tfmain.break_imgs()
+
+@app.route('/liblogin', methods=['POST'])
+def liblogin():
+    usename = str(request.form['usename'])
+    password = str(request.form['password'])
+    print(usename,password)
+    return str(crawler.lib_login(usename,password))
+
+'''
 @app.route('/login', methods=['POST','GET'])
 def my_page():
     if request.method == "GET":
@@ -38,8 +52,8 @@ def my_page():
             connection.cursor()
 
             return render_template("my.html")
-
+'''
 
 print('begin')
 if __name__ == '__main__':
-    app.run(debug=True) #host='0.0.0.0', port=80, 
+    app.run(debug=True,host='0.0.0.0',port=98) #host='0.0.0.0', port=80, 

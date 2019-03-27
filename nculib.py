@@ -2,7 +2,7 @@
 import json
 import re
 import time
-import pymysql.cursors
+# import pymysql.cursors
 from io import BytesIO
 from flask import render_template,request
 import requests
