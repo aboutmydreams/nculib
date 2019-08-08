@@ -14,6 +14,8 @@ start = time.clock()
 
 
 def say_num(cookie1=None):
+    """这是一个识别验证码的函数，返回[验证码，cookie, csrf_token]"""
+
     url = 'http://210.35.251.243/reader/captcha.php?'
     bd_session = requests.Session()
     if not cookie1:
@@ -27,6 +29,8 @@ def say_num(cookie1=None):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
         }
         response = bd_session.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, "html5lib")
+    csrf_token = soup.find('input', {'id': 'csrf_token'}).get('value')
     img = Image.open(BytesIO(response.content))
     # print(img.format,img.size,img.mode)
     img = img.convert('L')
@@ -70,8 +74,7 @@ def say_num(cookie1=None):
         b = b/10
     a = int(r_num)
     print(a)
-    return a, cookii
-# 这是一个识别验证码的函数，返回[验证码，cookie]
+    return a, cookii, csrf_token
 
 
 def login(user, psd):
