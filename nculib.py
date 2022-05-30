@@ -58,18 +58,14 @@ def say_num(cookie1=None):
                 anum = 7
             else:
                 anum = 9
+        elif i.getpixel((1,7)) is 2:
+            anum = 8 if i.getpixel((5,3)) is 2 else 6
+        elif i.getpixel((0,1)) is 2:
+            anum = 3
+        elif i.getpixel((1,1)) is 212:
+            anum = 4
         else:
-            if i.getpixel((1,7)) is 2:
-                if i.getpixel((5,3)) is 2:
-                    anum = 8
-                else:
-                    anum = 6
-            elif i.getpixel((0,1)) is 2:
-                anum = 3
-            elif i.getpixel((1,1)) is 212:
-                anum = 4
-            else:
-                anum = 2
+            anum = 2
         r_num = r_num + (anum * b)
         b = b/10
     a = int(r_num)
@@ -80,19 +76,20 @@ def say_num(cookie1=None):
 def login(user, psd):
     logi = say_num()
     captcha = logi[0]
-    coki = 'PHPSESSID={}'.format(logi[1]['PHPSESSID'])
+    coki = f"PHPSESSID={logi[1]['PHPSESSID']}"
     headers = {
         'Cookie': coki,
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
     }
 
     data = {
-        'number': '{}'.format(user),
-        'passwd': '{}'.format(psd),
+        'number': f'{user}',
+        'passwd': f'{psd}',
         'captcha': captcha,
         'select': 'cert_no',
         'returnUrl': '',
     }
+
     Status = requests.post('http://210.35.251.243/reader/redr_verify.php', headers=headers, data=data).status_code
     print(Status)
     if Status != 200:
@@ -103,34 +100,26 @@ def login(user, psd):
 
 def get_mynow_bk(cookie):
     bk_ls_url = 'http://210.35.251.243/reader/book_lst.php'
-    headers = {
-        'Cookie': '{}'.format(cookie),
-    } 
+    headers = {'Cookie': f'{cookie}'}
     res = requests.get(bk_ls_url, headers=headers)
-    my_datas = {}
     bk_data = []
     soup = BeautifulSoup(res.text,'lxml')
     bk_title = soup.select('a.blue')
     last_times = soup.select('font')
     all_td = soup.select('td.whitetext')
     student_name = last_times[0].get_text()
-    my_datas['name'] = student_name
+    my_datas = {'name': student_name}
     string = str(list(all_td[7::8]))
     find_check = re.findall("getInLib\((.+?)\)", string)
     checks = str(find_check).replace('\'','').split(',')[1::3]
 
-    for i, last_time, tiao_ma_hao, check in zip(bk_title, last_times[1:], all_td[0::8], checks):
-        one_bk_data = []
+    for i, last_time, tiao_ma_hao, check in zip(bk_title, last_times[1:], all_td[::8], checks):
         lib_bk_url = 'http://210.35.251.243/opac/item.php?marc_no='+ i.get('href')[25:]
         book_name = i.get_text()
         last_time = last_time.get_text().strip()
         tiao_ma_hao = tiao_ma_hao.get_text().strip()
 
-        one_bk_data.append(book_name)
-        one_bk_data.append(last_time)
-        one_bk_data.append(lib_bk_url)
-        one_bk_data.append(tiao_ma_hao)
-        one_bk_data.append(check)
+        one_bk_data = [book_name, last_time, lib_bk_url, tiao_ma_hao, check]
         bk_data.append(one_bk_data)
 
     my_datas['books'] = bk_data
@@ -142,7 +131,8 @@ def get_mynow_bk(cookie):
 def xu_jie(cookie, tiao_kuan_ma, check):
     captcha_num = say_num(cookie)[0]
     now_time = int(time.time())
-    url = 'http://210.35.251.243/reader/ajax_renew.php?bar_code={}&check={}&captcha={}&time={}'.format(tiao_kuan_ma, check, captcha_num, now_time)
+    url = f'http://210.35.251.243/reader/ajax_renew.php?bar_code={tiao_kuan_ma}&check={check}&captcha={captcha_num}&time={now_time}'
+
     headers = {
         'Cookie': cookie,
         'Referer': 'http://210.35.251.243/reader/book_lst.php',
@@ -178,8 +168,7 @@ def my_all_bk(cookie):
     time2 = td_list[12::7]
     all_bk = []
     for name, t1, t2 in zip(bk_name_list, time1, time2):
-        a_bk = []
-        a_bk.append(name.get_text())
+        a_bk = [name.get_text()]
         a_bk.append(t1.get_text())
         a_bk.append(t2.get_text())
         all_bk.append(a_bk)
@@ -198,15 +187,15 @@ def my_rank(cookie):
     soup = BeautifulSoup(res.text, 'lxml')
     if "证件信息" not in res.text:
         return 'error'
-    rank = soup.select(site)[0].get_text()
-    return rank
+    return soup.select(site)[0].get_text()
 # 返回字符串 超越人数
 
 
 def findall_book(seachname, xiaoqu=None):
     if not xiaoqu:
         xiaoqu = 'ALL'
-    url0 = 'http://210.35.251.243/opac/openlink.php?dept={}&title={}&doctype=ALL&lang_code=ALL&match_flag=forward&displaypg=100&showmode=list&orderby=DESC&sort=CATA_DATE&onlylendable=no&with_ebook=on'.format(str(xiaoqu),str(seachname))#第一页
+    url0 = f'http://210.35.251.243/opac/openlink.php?dept={str(xiaoqu)}&title={str(seachname)}&doctype=ALL&lang_code=ALL&match_flag=forward&displaypg=100&showmode=list&orderby=DESC&sort=CATA_DATE&onlylendable=no&with_ebook=on'
+
     wb_data = requests.get(url0)
     if '本馆没有' in wb_data.text:
         return 0
@@ -214,10 +203,8 @@ def findall_book(seachname, xiaoqu=None):
     titles = soup.select('#search_book_list > li > h3')
     kejies = soup.select('#search_book_list > li > p > span')
     booknums = str(soup.select('strong.red')[0])[20:-9]
-    n = 1
-    bks = {}
-    bks['allsum'] = booknums
-    for title,kejie in zip(titles,kejies):
+    bks = {'allsum': booknums}
+    for n, (title, kejie) in enumerate(zip(titles,kejies), start=1):
         atitle = str(title)
         try:
             titlesspace = list(title.stripped_strings)[2]
@@ -225,16 +212,14 @@ def findall_book(seachname, xiaoqu=None):
             titlesspace = ''
         except Exception as e:
             raise
-            pass
         data = {
-            'titlesname' : list(title.stripped_strings)[1],
-            'titlesspace' : titlesspace,
-            'titleslink' : 'http://210.35.251.243/opac/item.php?marc_no='+atitle[47:57],
-            'kejie' : str(list(kejie.stripped_strings)[1])[-1]+'/'+str(list(kejie.stripped_strings)[0])[-1]
-
+            'titlesname': list(title.stripped_strings)[1],
+            'titlesspace': titlesspace,
+            'titleslink': f'http://210.35.251.243/opac/item.php?marc_no={atitle[47:57]}',
+            'kejie': f'{str(list(kejie.stripped_strings)[1])[-1]}/{str(list(kejie.stripped_strings)[0])[-1]}',
         }
+
         bks[n] = data
-        n += 1
     return bks
 # 全部搜索
 
@@ -242,7 +227,8 @@ def findall_book(seachname, xiaoqu=None):
 def get_book(seachname, xiaoqu=None):
     if not xiaoqu:
         xiaoqu = 'ALL'
-    url0 = 'http://210.35.251.243/opac/openlink.php?dept={}&title={}&doctype=ALL&lang_code=ALL&match_flag=forward&displaypg=100&showmode=list&orderby=DESC&sort=CATA_DATE&onlylendable=yes&with_ebook=on'.format(str(xiaoqu),str(seachname))#第一页
+    url0 = f'http://210.35.251.243/opac/openlink.php?dept={str(xiaoqu)}&title={str(seachname)}&doctype=ALL&lang_code=ALL&match_flag=forward&displaypg=100&showmode=list&orderby=DESC&sort=CATA_DATE&onlylendable=yes&with_ebook=on'
+
     # 表格 快0.3s 但是没有可借数据 url1 = 'http://210.35.251.243/opac/openlink.php?strSearchType=title&match_flag=forward&historyCount=1&strText={}&doctype=ALL&with_ebook=on&displaypg=100&showmode=table&sort=CATA_DATE&orderby=desc&dept=ALL'.format(str(seachname))
     wb_data = requests.get(url0)
     if '本馆没有' in wb_data.text:
@@ -251,10 +237,8 @@ def get_book(seachname, xiaoqu=None):
     titles = soup.select('#search_book_list > li > h3')
     kejies = soup.select('#search_book_list > li > p > span')
     booknums = str(soup.select('strong.red')[0])[20:-9]
-    n = 1
-    bks = {}
-    bks['allsum'] = booknums
-    for title,kejie in zip(titles,kejies):
+    bks = {'allsum': booknums}
+    for n, (title, kejie) in enumerate(zip(titles,kejies), start=1):
         atitle = str(title)
         try:
             titlesspace = list(title.stripped_strings)[2]
@@ -262,15 +246,14 @@ def get_book(seachname, xiaoqu=None):
             titlesspace = ''
         except Exception as e:
             raise
-            pass
         data = {
-            'titlesname' : list(title.stripped_strings)[1],
-            'titlesspace' : titlesspace,
-            'titleslink' : 'http://210.35.251.243/opac/item.php?marc_no='+atitle[47:57],
-            'kejie' : str(list(kejie.stripped_strings)[1])[-1]+'/'+str(list(kejie.stripped_strings)[0])[-1]
+            'titlesname': list(title.stripped_strings)[1],
+            'titlesspace': titlesspace,
+            'titleslink': f'http://210.35.251.243/opac/item.php?marc_no={atitle[47:57]}',
+            'kejie': f'{str(list(kejie.stripped_strings)[1])[-1]}/{str(list(kejie.stripped_strings)[0])[-1]}',
         }
+
         bks[n] = data
-        n += 1
     return str(bks)
 # 只返回可借的，没有可借时才返回不可借的，格式为
 # allsum:'149(检索到书的本书)', 1：{'titlesname' :'书名'，'titlesspace' :'索书号（位置）', 'titleslink' :'书籍链接', 'kejie':'可借分书'}}
@@ -278,18 +261,14 @@ def get_book(seachname, xiaoqu=None):
 
 def isbn_dou(isbn):
     isbn = isbn.replace('-','')
-    url = 'https://api.douban.com/v2/book/isbn/'+isbn
+    url = f'https://api.douban.com/v2/book/isbn/{isbn}'
     response = requests.get(url).text
     result = eval(response)
-    douban_data = {}
-    if "catalog" in result:
-        douban_data["catalog"] = result["catalog"]
-    else:
-        douban_data["catalog"] = ""
-    if "image" in result:
-        douban_data["image"] = result["image"]
-    else:
-        douban_data["image"] = ""
+    douban_data = {
+        "catalog": result["catalog"] if "catalog" in result else "",
+        "image": result["image"] if "image" in result else "",
+    }
+
     if "summary" in result:
         douban_data["intro"] = result["summary"]
     return douban_data
@@ -297,7 +276,7 @@ def isbn_dou(isbn):
 
 
 def lib_bk(num):
-    url = 'http://210.35.251.243/opac/item.php?marc_no={}'.format(num)
+    url = f'http://210.35.251.243/opac/item.php?marc_no={num}'
     res = requests.get(url).text
     soup = BeautifulSoup(res,'lxml')
     datas = soup.select('dl')
@@ -307,22 +286,16 @@ def lib_bk(num):
         if len(one_line) == 4:
             what_name = one_line[1]
             what_thing = one_line[2]
-            all_data['{}'.format(what_name)] = what_thing
+            all_data[f'{what_name}'] = what_thing
     last_data = {}
     try:
         bk_name_au = all_data['题名/责任者:'].split('/')
         last_data['name'] = bk_name_au[0]
         last_data['author'] = bk_name_au[1][:-2]
         isbn0 = re.findall(r'\d+', all_data['ISBN及定价:'].replace('-', ''))
-        if len(isbn0) > 0:
-            isbn = isbn0[0]
-        else:
-            isbn = '不明'
+        isbn = isbn0[0] if len(isbn0) > 0 else '不明'
         last_data['isbn'] = isbn
-        if '中图法分类号:' not in all_data:
-            last_data['place'] = '不明'
-        else:
-            last_data['place'] = all_data['中图法分类号:']
+        last_data['place'] = '不明' if '中图法分类号:' not in all_data else all_data['中图法分类号:']
         if '出版发行项:' not in all_data:
             last_data['pub'] = '不明'
             last_data['year'] = '不明'
@@ -336,15 +309,9 @@ def lib_bk(num):
             last_data['pages'] = '不明'
         else:
             ye_site = all_data['载体形态项:'].find('页')
-            last_data['pages'] = all_data['载体形态项:'][0:ye_site]
-        if '学科主题:' not in all_data:
-            last_data['bk_class'] = '不明'
-        else:
-            last_data['bk_class'] = all_data['学科主题:']
-        if '提要文摘附注:' not in all_data:
-            last_data['intro'] = '不明'
-        else:
-            last_data['intro'] = all_data['提要文摘附注:']
+            last_data['pages'] = all_data['载体形态项:'][:ye_site]
+        last_data['bk_class'] = '不明' if '学科主题:' not in all_data else all_data['学科主题:']
+        last_data['intro'] = '不明' if '提要文摘附注:' not in all_data else all_data['提要文摘附注:']
         douban_data = isbn_dou(isbn)
         last_data = dict(last_data, **douban_data) # 合并两个字典，如果有豆瓣的简介，图书馆的简介将会被取代
         return last_data

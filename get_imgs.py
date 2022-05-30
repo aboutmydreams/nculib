@@ -30,7 +30,7 @@ def save_test_imgs(train_img_path):
             img_list = solve_it.cut_img_to_img_list(img,30,background=255)
             for k,i in enumerate(img_list):
                 random_num = str(time.time())[-10:-3].replace('.',str(random.random())[2:4])
-                i.save('test_imgs/{}.png'.format(file[k]+'-'+random_num))
+                i.save(f'test_imgs/{file[k]}-{random_num}.png')
         os.remove(train_img_path + file)
 
 def save_train_imgs(train_img_path):
@@ -43,7 +43,7 @@ def save_train_imgs(train_img_path):
             img_list = solve_it.cut_img_to_img_list(img,30,background=255)
             for k,i in enumerate(img_list):
                 random_num = str(time.time())[-10:-3].replace('.',str(random.random())[2:4])
-                i.save('train_imgs/{}.png'.format(file[k]+'-'+random_num))
+                i.save(f'train_imgs/{file[k]}-{random_num}.png')
 
 def remove_file(train_img_path):
     data_list = os.listdir(train_img_path)

@@ -28,8 +28,7 @@ def signin():
 
 @app.route("/<bookname>", methods=['GET'])
 def download_file(bookname):
-    bk_data = nculib.get_book(bookname)
-    return bk_data
+    return nculib.get_book(bookname)
 
 @app.route('/break', methods=['GET'])
 def break_img():
